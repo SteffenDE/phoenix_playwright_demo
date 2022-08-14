@@ -5,7 +5,7 @@ defmodule PlaywrightTestsWeb.Endpoint do
   if Mix.env() == :e2e do
     plug(Phoenix.Ecto.SQL.Sandbox,
       at: "/sandbox",
-      repo: PlaywrightTest.Repo,
+      repo: PlaywrightTests.Repo,
       timeout: 35_000
     )
   end

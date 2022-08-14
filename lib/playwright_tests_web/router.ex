@@ -108,4 +108,12 @@ defmodule PlaywrightTestsWeb.Router do
     get "/users/confirm/:token", UserConfirmationController, :edit
     post "/users/confirm/:token", UserConfirmationController, :update
   end
+
+  ## Routes for e2e tests
+  if Mix.env() == :e2e do
+    scope "/testapi", PlaywrightTestsWeb.TestHelpers do
+      pipe_through(:api)
+      post("/register", PlaywrightController, :register)
+    end
+  end
 end

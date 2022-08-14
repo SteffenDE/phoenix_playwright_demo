@@ -1,5 +1,7 @@
 # PlaywrightTests
 
+This repo contains an example Phoenix project using Playwright for concurrent end-to-end tests.
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
@@ -17,3 +19,13 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Docs: https://hexdocs.pm/phoenix
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
+
+## Running end to end tests
+
+```bash
+MIX_ENV=e2e mix ecto.setup && mix phx.server
+# in another terminal
+cd playwright
+npx playwright install
+npx playwright test
+```
