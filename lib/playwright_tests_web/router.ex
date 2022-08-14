@@ -72,12 +72,31 @@ defmodule PlaywrightTestsWeb.Router do
     put "/users/reset_password/:token", UserResetPasswordController, :update
   end
 
-  scope "/", PlaywrightTestsWeb do
-    pipe_through [:browser, :require_authenticated_user]
+  on_mount = [
+    {PlaywrightTestsWeb.InitAssigns, :ensure_user}
+  ]
 
-    get "/users/settings", UserSettingsController, :edit
-    put "/users/settings", UserSettingsController, :update
-    get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+  on_mount =
+    case Mix.env() do
+      :e2e -> [{PlaywrightTestsWeb.AllowEctoSandbox, :default}] ++ on_mount
+      _ -> on_mount
+    end
+
+  live_session :authenticated, on_mount: on_mount do
+    scope "/", PlaywrightTestsWeb do
+      pipe_through [:browser, :require_authenticated_user]
+
+      get "/users/settings", UserSettingsController, :edit
+      put "/users/settings", UserSettingsController, :update
+      get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+
+      live "/todos", TodoLive.Index, :index
+      live "/todos/new", TodoLive.Index, :new
+      live "/todos/:id/edit", TodoLive.Index, :edit
+
+      live "/todos/:id", TodoLive.Show, :show
+      live "/todos/:id/show/edit", TodoLive.Show, :edit
+    end
   end
 
   scope "/", PlaywrightTestsWeb do

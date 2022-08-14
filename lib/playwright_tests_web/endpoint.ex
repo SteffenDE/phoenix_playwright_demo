@@ -1,6 +1,15 @@
 defmodule PlaywrightTestsWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :playwright_tests
 
+  # see https://hexdocs.pm/phoenix_ecto/Phoenix.Ecto.SQL.Sandbox.html
+  if Mix.env() == :e2e do
+    plug(Phoenix.Ecto.SQL.Sandbox,
+      at: "/sandbox",
+      repo: PlaywrightTest.Repo,
+      timeout: 35_000
+    )
+  end
+
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
@@ -10,7 +19,16 @@ defmodule PlaywrightTestsWeb.Endpoint do
     signing_salt: "PZSOP9AL"
   ]
 
-  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
+  if Mix.env() == :e2e do
+    # end to end test ecto sql sandbox needs the user-agent header
+    socket("/live", Phoenix.LiveView.Socket,
+      websocket: [connect_info: [:user_agent, session: @session_options]]
+    )
+  else
+    socket("/live", Phoenix.LiveView.Socket,
+      websocket: [connect_info: [session: @session_options]]
+    )
+  end
 
   # Serve at "/" the static files from "priv/static" directory.
   #
